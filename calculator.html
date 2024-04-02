@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Calculator</title>
+<style>
+    .calculator {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 5px;
+        padding: 10px;
+    }
+
+    .display {
+        grid-column: span 4;
+        background-color: #eee;
+        padding: 10px;
+        text-align: right;
+        font-size: 1.5em;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 1.2em;
+    }
+</style>
+</head>
+<body>
+<div class="calculator">
+    <div class="display" id="display">0</div>
+    <button onclick="clearDisplay()">C</button>
+    <button onclick="appendToDisplay('7')">7</button>
+    <button onclick="appendToDisplay('8')">8</button>
+    <button onclick="appendToDisplay('9')">9</button>
+    <button onclick="operate('+')">+</button>
+    <button onclick="appendToDisplay('4')">4</button>
+    <button onclick="appendToDisplay('5')">5</button>
+    <button onclick="appendToDisplay('6')">6</button>
+    <button onclick="operate('-')">-</button>
+    <button onclick="appendToDisplay('1')">1</button>
+    <button onclick="appendToDisplay('2')">2</button>
+    <button onclick="appendToDisplay('3')">3</button>
+    <button onclick="operate('*')">*</button>
+    <button onclick="appendToDisplay('0')">0</button>
+    <button onclick="appendToDisplay('.')">.</button>
+    <button onclick="calculate()">=</button>
+    <button onclick="operate('/')">/</button>
+</div>
+
+<script>
+    let displayValue = '0';
+    let operator = '';
+    let firstOperand = null;
+    let waitingForSecondOperand = false;
+
+    function updateDisplay() {
+        const display = document.getElementById('display');
+        display.textContent = displayValue;
+    }
+
+    function clearDisplay() {
+        displayValue = '0';
+        operator = '';
+        firstOperand = null;
+        waitingForSecondOperand = false;
+        updateDisplay();
+    }
+
+    function appendToDisplay(digit) {
+        if (waitingForSecondOperand) {
+            displayValue = digit;
+            waitingForSecondOperand = false;
+        } else {
+            displayValue = displayValue === '0' ? digit : displayValue + digit;
+        }
+        updateDisplay();
+    }
+
+    function operate(nextOperator) {
+        const inputValue = parseFloat(displayValue);
+
+        if (firstOperand === null) {
+            firstOperand = inputValue;
+        } else if (operator) {
+            const result = performCalculation();
+            displayValue = String(result);
+            firstOperand = result;
+        }
+
+        waitingForSecondOperand = true;
+        operator = nextOperator;
+    }
+
+    function performCalculation() {
+        const currentValue = parseFloat(displayValue);
+        let result = 0;
+
+        switch (operator) {
+            case '+':
+                result = firstOperand + currentValue;
+                break;
+            case '-':
+                result = firstOperand - currentValue;
+                break;
+            case '*':
+                result = firstOperand * currentValue;
+                break;
+            case '/':
+                result = firstOperand / currentValue;
+                break;
+        }
+
+        return result;
+    }
+
+    function calculate() {
+        const inputValue = parseFloat(displayValue);
+        if (operator && !waitingForSecondOperand) {
+            displayValue = performCalculation();
+            operator = '';
+            firstOperand = null;
+            waitingForSecondOperand = true;
+            updateDisplay();
+        }
+    }
+
+    updateDisplay();
+</script>
+</body>
+</html>
